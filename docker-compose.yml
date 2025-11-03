@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  typesense:
+    image: typesense/typesense:0.25.1
+    restart: on-failure
+    ports:
+      - "8108:8108"
+    volumes:
+      - typesense-data:/data
+    command: '--data-dir /data --api-key=xyz --enable-cors'
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - typesense
+    environment:
+      - TYPESENSE_HOST=typesense
+      - TYPESENSE_PORT=8108
+      - TYPESENSE_PROTOCOL=http
+      - TYPESENSE_API_KEY=xyz
+
+volumes:
+  typesense-data:
